@@ -15,7 +15,7 @@ def train_fn(model, optimizer, dataloader, device, scheduler=None):
     num_steps = 0
     train_loss = None
 
-    pbar = tqdm(enumerate(dataloader))
+    pbar = tqdm(enumerate(dataloader), total=len(dataloader))
 
     for bi, b in pbar:
         num_steps += 1
@@ -49,7 +49,7 @@ def valid_fn(model, dataloader, device):
     all_targets = []
 
     with torch.no_grad():
-        for b in tqdm(dataloader):
+        for b in tqdm(dataloader, total=len(dataloader)):
             input_ids = b['input_ids'].to(device)
             att_mask = b['attention_mask'].to(device)
             targets = b['targets'].to(device)
@@ -60,10 +60,16 @@ def valid_fn(model, dataloader, device):
                 decoder_input_ids = targets
             )
 
-            all_outputs.extend(torch.sigmoid(preds.logits).detach().cpu().numpy().aslist())
-            all_targets.extend(targets.detach().cpu().numpy().aslist())
+            all_outputs.extend(preds.logits)
+            all_targets.extend(targets)
         
-        return all_outputs, all_targets
+        all_outputs = torch.stack(all_outputs)
+        all_targets = torch.stack(all_targets)
+        print(all_outputs.shape)
+
+        valid_loss = loss_fn(all_outputs, all_targets)
+
+    return valid_loss
 
 def eval_fn(model, dataloader, device):
     model.eval()
@@ -71,7 +77,7 @@ def eval_fn(model, dataloader, device):
     all_targets = []
 
     with torch.no_grad():
-        for b in tqdm(dataloader):
+        for b in tqdm(dataloader, total=len(dataloader)):
             input_ids = b['input_ids'].to(device)
             att_mask = b['attention_mask'].to(device)
             targets = b['targets']
@@ -81,7 +87,7 @@ def eval_fn(model, dataloader, device):
                 attention_mask = att_mask,
             )
 
-            all_outputs.extend(preds.detach().cpu().numpy().aslist())
-            all_targets.extend(targets.cpu().numpy().aslist())
+            all_outputs.extend(preds.detach().cpu().numpy().tolist())
+            all_targets.extend(targets.cpu().numpy().tolist())
         
         return all_outputs, all_targets
