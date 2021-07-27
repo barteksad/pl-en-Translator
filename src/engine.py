@@ -20,9 +20,9 @@ def train_fn(model, optimizer, dataloader, device, scheduler=None):
     for bi, b in pbar:
         num_steps += 1
 
-        input_ids = torch.squeeze(b['input_ids'].to(device))
-        att_mask = torch.squeeze(b['attention_mask'].to(device))
-        targets = torch.squeeze(b['targets'].to(device))
+        input_ids = b['input_ids'].to(device)
+        att_mask = b['attention_mask'].to(device)
+        targets = b['targets'].to(device)
 
         optimizer.zero_grad()
         preds = model(

@@ -1,5 +1,7 @@
 from config import CFG
 
+import torch
+
 class TranslationDataset:
     def __init__(self, x, y, tokenizer, max_len=None):
         self.x = x # sentence in polish
@@ -12,14 +14,19 @@ class TranslationDataset:
     
     def __getitem__(self, idx):
         sentence = self.x[idx]
-        tokenized_sentence = self.tokenizer(sentence, return_tensors='pt', padding='max_length', truncation=True)
+        tokenized_sentence = self.tokenizer(sentence, padding='max_length', truncation=True)
+
+        item = {
+            'input_ids' : torch.tensor(tokenized_sentence['input_ids'], dtype=torch.long),
+            'attention_mask' : torch.tensor(tokenized_sentence['attention_mask'], dtype=torch.long)
+        }
 
         if self.y is not None:
             translation = self.y[idx]
-            tokenized_translation = self.tokenizer(translation, return_tensors='pt', padding='max_length', truncation=True)
-            tokenized_sentence['targets'] = tokenized_translation['input_ids']
-        
-        return tokenized_sentence
+            tokenized_translation = self.tokenizer(translation, padding='max_length', truncation=True)
+            item['targets'] = torch.tensor(tokenized_translation['input_ids'], dtype=torch.long)
+
+        return item
 
 if __name__ == '__main__':
     # tests
