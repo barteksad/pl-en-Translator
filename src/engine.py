@@ -65,11 +65,10 @@ def valid_fn(model, dataloader, device):
         
         all_outputs = torch.stack(all_outputs)
         all_targets = torch.stack(all_targets)
-        print(all_outputs.shape)
 
         valid_loss = loss_fn(all_outputs, all_targets)
 
-    return valid_loss
+        return valid_loss.item()
 
 def eval_fn(model, dataloader, device):
     model.eval()
