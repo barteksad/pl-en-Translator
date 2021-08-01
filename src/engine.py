@@ -1,4 +1,4 @@
-from tqdm.notebook import tqdm
+from tqdm.auto import tqdm
 
 import torch
 import torch.nn.functional as F
