@@ -85,7 +85,7 @@ if __name__ == '__main__':
         all_outputs, all_targets = engine.eval_fn(model, valid_dl, device)
         score = engine.compute_score(all_outputs, all_targets, tokenizer, metrics)
 
-        if score < best_bleu:
+        if score > best_bleu:
             best_bleu = score
             model.save_pretrained(best_bleu_model_checkpoint)
 
