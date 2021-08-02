@@ -67,7 +67,7 @@ if __name__ == '__main__':
     best_loss = float('inf')
     best_bleu = 0
 
-    model = model.to(device)
+    model.to(device)
 
     # before finetuning
     all_outputs, all_targets = engine.eval_fn(model, valid_dl, device)
