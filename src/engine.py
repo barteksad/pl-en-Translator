@@ -48,8 +48,7 @@ def train_fn(model, optimizer, dataloader, device, scheduler=None):
 
 def valid_fn(model, dataloader, device):
     model.eval()
-    all_outputs = []
-    all_targets = []
+    all_valid_loss = []
 
     with torch.no_grad():
         for b in tqdm(dataloader, total=len(dataloader)):
@@ -63,15 +62,9 @@ def valid_fn(model, dataloader, device):
                 decoder_input_ids = targets
             )
 
-            all_outputs.extend(preds.logits)
-            all_targets.extend(targets)
-        
-        all_outputs = torch.stack(all_outputs)
-        all_targets = torch.stack(all_targets)
+            all_valid_loss.append(loss_fn(preds.logits, targets).item())
 
-        valid_loss = loss_fn(all_outputs, all_targets)
-
-        return valid_loss.item()
+        return np.mean(all_valid_loss)
 
 def eval_fn(model, dataloader, device):
     model.eval()

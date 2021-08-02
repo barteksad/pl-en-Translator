@@ -17,7 +17,7 @@ from sklearn.model_selection import train_test_split
 
 
 
-debug = True
+debug = False
 
 def set_seed(seed=42):
     np.random.seed(seed)
@@ -51,7 +51,7 @@ if __name__ == '__main__':
     print(f'train size: {len(x_train)}, valid size: {len(x_valid)}')   
 
     train_ds = dataset.TranslationDataset(x_train, y_train, tokenizer)
-    train_dl = torch.utils.data.DataLoader(train_ds, CFG.train_batch_size, num_workers = 1)
+    train_dl = torch.utils.data.DataLoader(train_ds, batch_size=CFG.train_batch_size, num_workers = 1)
 
     valid_ds  = dataset.TranslationDataset(x_valid, y_valid, tokenizer)
     valid_dl = torch.utils.data.DataLoader(valid_ds, batch_size=CFG.valid_batch_size,  num_workers = 1)
