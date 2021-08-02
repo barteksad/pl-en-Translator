@@ -89,4 +89,4 @@ if __name__ == '__main__':
             best_bleu = score
             model.save_pretrained(best_bleu_model_checkpoint)
 
-        print(f'epoch {epoch + 1}, valid loss: {valid_loss}, bleu score: {score["score"]}')
+        print(f'epoch {epoch + 1}, valid loss: {valid_loss}, bleu score: {score}')
