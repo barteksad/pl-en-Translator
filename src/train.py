@@ -27,16 +27,18 @@ def set_seed(seed=42):
 
 if __name__ == '__main__':
     set_seed()
+    PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     metrics = load_metric('sacrebleu')
 
     tokenizer = AutoTokenizer.from_pretrained(CFG.model_name)
 
-    if not os.path.exists('model_checkpoints/base_model/'):
+    if not os.path.exists(os.path.join(PROJECT_DIR, 'model_checkpoints/base_model/')):
         model = AutoModelForSeq2SeqLM.from_pretrained(CFG.model_name)
-        model.save_pretrained('model_checkpoints/base_model')
+        model.save_pretrained(os.path.join(PROJECT_DIR, 'model_checkpoints/base_model/'))
     else:
-        model = AutoModelForSeq2SeqLM.from_pretrained('model_checkpoints/base_model/')
+        model = AutoModelForSeq2SeqLM.from_pretrained(os.path.join(PROJECT_DIR, 'model_checkpoints/base_model/'))
 
 
     raw_dataset = load_dataset("europa_eac_tm", language_pair=("pl", "en"))
@@ -61,8 +63,8 @@ if __name__ == '__main__':
     warmup_steps = len(x_train) // CFG.train_batch_size
     scheduler = get_cosine_schedule_with_warmup(optimizer, num_warmup_steps = warmup_steps, num_training_steps = total_steps) 
 
-    best_loss_model_checkpoint = 'model_checkpoints/finetuned_model_best_loss'
-    best_bleu_model_checkpoint = 'model_checkpoints/finetuned_model_best_bleu'
+    best_loss_model_checkpoint = os.path.join(PROJECT_DIR, 'model_checkpoints/finetuned_model_best_loss/')
+    best_bleu_model_checkpoint = os.path.join(PROJECT_DIR, 'model_checkpoints/finetuned_model_best_bleu/')
 
     best_loss = float('inf')
     best_bleu = 0

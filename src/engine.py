@@ -83,7 +83,7 @@ def eval_fn(model, dataloader, device):
             )
 
             all_outputs.extend(preds.detach().cpu().numpy().tolist())
-            all_targets.extend(targets.cpu().numpy().tolist())
+            all_targets.extend(targets.detach().cpu().numpy().tolist())
         
         return all_outputs, all_targets
 
