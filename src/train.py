@@ -67,6 +67,13 @@ if __name__ == '__main__':
     best_loss = float('inf')
     best_bleu = 0
 
+    model = model.to(device)
+
+    # before finetuning
+    all_outputs, all_targets = engine.eval_fn(model, valid_dl, device)
+    score = engine.compute_score(all_outputs, all_targets, tokenizer, metrics)
+    print(f'bleu before finetuning: {score}')
+
     for epoch in range(CFG.epochs):
         engine.train_fn(model, optimizer, train_dl, device, scheduler)
         valid_loss = engine.valid_fn(model, valid_dl, device)
@@ -76,14 +83,10 @@ if __name__ == '__main__':
             model.save_pretrained(best_loss_model_checkpoint)
 
         all_outputs, all_targets = engine.eval_fn(model, valid_dl, device)
+        score = engine.compute_score(all_outputs, all_targets, tokenizer, metrics)
 
-        all_outputs = tokenizer.batch_decode(all_outputs, skip_special_tokens=True)
-        all_targets = tokenizer.batch_decode(all_targets, skip_special_tokens=True)
-        all_targets = [[i] for i in all_targets]
-        score = metrics.compute(predictions=all_outputs, references = tmp)
-
-        if score['score'] < best_bleu:
-            best_bleu = score['score']
+        if score < best_bleu:
+            best_bleu = score
             model.save_pretrained(best_bleu_model_checkpoint)
 
         print(f'epoch {epoch + 1}, valid loss: {valid_loss}, bleu score: {score["score"]}')

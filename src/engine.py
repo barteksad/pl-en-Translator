@@ -1,8 +1,11 @@
+import numpy as np
 from tqdm.auto import tqdm
 
 import torch
 import torch.nn.functional as F
 from torch.nn.functional import cross_entropy
+
+import datasets
 
 def loss_fn(y_pred, y_true):
     loss = cross_entropy(y_pred.permute(0,2,1), y_true)
@@ -90,3 +93,13 @@ def eval_fn(model, dataloader, device):
             all_targets.extend(targets.cpu().numpy().tolist())
         
         return all_outputs, all_targets
+
+
+def compute_score(all_outputs, all_targets, tokenizer, metrics : datasets.Metric):
+    all_outputs = tokenizer.batch_decode(all_outputs, skip_special_tokens=True)
+    all_targets = tokenizer.batch_decode(all_targets, skip_special_tokens=True)
+    all_targets = np.expand_dims(all_targets, axis=1)
+    
+    score = metrics.compute(predictions=all_outputs, references = all_targets)
+
+    return score['score']
